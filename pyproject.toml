@@ -9,6 +9,7 @@ dependencies = [
     "pydantic>=2.11.1",
     "pydantic-ai>=0.0.55",
     "pydantic-settings>=2.8.1",
+    "pydub>=0.25.1",
     "python-telegram-bot>=22.0",
 ]
 
