@@ -14,7 +14,8 @@ class GeminiSettings(BaseSettings):
         env_file=ROOT_DIRECTORY / '.env',
         env_file_encoding='utf-8',
         env_prefix='GEMINI_',
-        case_sensitive=False
+        case_sensitive=False,
+        extra='ignore'
     )
 
     model_name: Literal["gemini-2.0-flash-lite", "gemini-1.5-flash", "gemini-2.5-pro-exp-03-25"] 
