@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import final
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -18,7 +18,13 @@ class TelegramSettings(BaseSettings):
     )
 
     api_key: SecretStr
-    chat_id: SecretStr
+    allowed_user_ids: list[SecretStr] = Field(default_factory=list)
+    
+    def check_user_id(self, user_id: int) -> bool:
+        """
+        Check if the provided user ID is in the allowed list.
+        """
+        return str(user_id) in [str(user_id.get_secret_value()) for user_id in self.allowed_user_ids]
 
 
 TELEGRAM_SETTIGNS: final = TelegramSettings()
