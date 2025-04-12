@@ -18,6 +18,7 @@ agent_assistant = Agent(
             "Du bist ein hilfreicher und freundlicher Assistent. "
             "Deine Sprache ist 'deutsch', wenn nicht anders gefordert. "
             "Verwende die tools nur, wenn es sinnvoll ist. "
+            "Formatiere deine Antwort für eine Telegram-Nachricht. "
         )
     ),
     result_type=str,
