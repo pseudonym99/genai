@@ -4,7 +4,7 @@ from telegram.ext import MessageHandler, filters, ContextTypes
 import filetype
 from pydantic_ai import BinaryContent
 
-from src.genai.agent import agent_assistant
+from src.genai.agent_assistant import agent_assistant
 from src.telegram.filters import allowed_user_filter
 from src.telegram.helpers import convert_ogg_bytes_to_wav_bytes
 
@@ -93,25 +93,25 @@ async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_prompt = []
         
         voice = update.message.voice
-        print(voice)
         voice_file = await context.bot.get_file(voice.file_id)
         voice_bytes_ogg = await voice_file.download_as_bytearray()
         voice_bytes_wav = convert_ogg_bytes_to_wav_bytes(voice_bytes_ogg)
         
-        user_prompt.append(
+        binary_content = [
             BinaryContent(
                 data=voice_bytes_wav,
                 media_type="audio/wav",
             )
-        )
+        ]
         
         if "history" not in context.chat_data:
             logging.warning("No history found in chat_data, initializing empty history.")
             context.chat_data['history'] = []
 
+
         # run agent
         result = await agent_assistant.run(
-            user_prompt=user_prompt,
+            user_prompt=user_prompt + binary_content,
             message_history=context.chat_data['history'],
         )
         
