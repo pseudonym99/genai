@@ -1,7 +1,15 @@
 from telegram import Update
 from telegram.ext import MessageHandler, filters, ContextTypes
 
-async def text(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Antwort auf Textnachricht: " + update.message.text)
+from src.telegram.filters import allowed_user_filter
 
-text_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), text)
+async def text(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not context.bot_data.get('is_active', False):
+        return await update.message.reply_text("Der Bot ist derzeit inaktiv.")
+    
+    return await update.message.reply_text("Antwort auf Textnachricht: " + update.message.text)
+
+text_handler = MessageHandler(
+    filters=filters.TEXT & (~filters.COMMAND) & allowed_user_filter,
+    callback=text
+)
