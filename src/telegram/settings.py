@@ -27,4 +27,4 @@ class TelegramSettings(BaseSettings):
         return str(user_id) in [str(user_id.get_secret_value()) for user_id in self.allowed_user_ids]
 
 
-TELEGRAM_SETTIGNS: final = TelegramSettings()
+TELEGRAM_SETTINGS: final = TelegramSettings()
