@@ -10,7 +10,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 def main():
     application = Application.builder().token(
         TELEGRAM_SETTINGS.api_key.get_secret_value()
-    ).build()
+    ).read_timeout(30).write_timeout(30).build()
     
     # Füge Handler hinzu
     application.add_handler(commands.start_handler)
