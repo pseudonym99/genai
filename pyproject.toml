@@ -5,9 +5,8 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "chainlit>=2.4.400",
     "pydantic>=2.11.1",
-    "pydantic-ai>=0.0.46",
+    "pydantic-ai>=0.0.55",
     "pydantic-settings>=2.8.1",
 ]
 
