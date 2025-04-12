@@ -2,7 +2,6 @@ from pydantic_ai import Agent, RunContext
 from pydantic_ai.models.gemini import GeminiModel
 
 from src.genai.settings import GEMINI_SETTINGS
-from src.genai.agent_transcript import agent_transcript
 
 from datetime import datetime
 
