@@ -5,11 +5,13 @@ from telegram.ext import ContextTypes
 
 from src.telegram.commands import start, stop
 
+
 @pytest.fixture
 def update():
     update = MagicMock(spec=Update)
     update.message.reply_text = AsyncMock()
     return update
+
 
 @pytest.fixture
 def context():
@@ -23,14 +25,15 @@ def context():
 async def test_start(update, context):
     await start(update, context)
 
-    assert context.bot_data['is_active'] is True
-    assert context.chat_data['history'] == []
-    update.message.reply_text.assert_awaited_once_with('Willkommen bei meinem Bot!')
+    assert context.bot_data["is_active"] is True
+    assert context.chat_data["history"] == []
+    update.message.reply_text.assert_awaited_once_with("Willkommen bei meinem Bot!")
+
 
 @pytest.mark.asyncio
 async def test_stop(update, context):
     await stop(update, context)
 
-    assert context.bot_data['is_active'] is False
-    assert context.chat_data['history'] == []
-    update.message.reply_text.assert_awaited_once_with('Bot wird gestoppt.')
+    assert context.bot_data["is_active"] is False
+    assert context.chat_data["history"] == []
+    update.message.reply_text.assert_awaited_once_with("Bot wird gestoppt.")
