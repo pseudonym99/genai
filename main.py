@@ -16,6 +16,7 @@ def main():
     application.add_handler(commands.start_handler)
     application.add_handler(commands.stop_handler)
     application.add_handler(messages.text_handler)
+    application.add_handler(messages.image_handler)
 
     # Starte den Bot
     application.run_polling()
