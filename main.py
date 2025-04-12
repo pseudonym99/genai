@@ -2,7 +2,7 @@ import logging
 from telegram.ext import Application
 
 from src.telegram.settings import TELEGRAM_SETTINGS
-from src.telegram.handlers import commands, messages
+from src.telegram import commands, messages
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
