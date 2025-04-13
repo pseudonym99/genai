@@ -31,10 +31,10 @@ async def text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message_history=context.chat_data["history"],
         )
 
-        reply_markdown = escape_markdown_v2(result.data)
+        reply_text = result.data
         context.chat_data["history"] = result.all_messages()
 
-        return await update.message.reply_markdown_v2(reply_markdown)
+        return await update.message.reply_markdown(reply_text)
     except Exception as e:
         logging.error(f"Error in text handler: {e}")
         return await update.message.reply_text("Ein Fehler ist aufgetreten.")
@@ -78,13 +78,13 @@ async def image(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message_history=context.chat_data["history"],
         )
 
-        reply_markdown = escape_markdown_v2(result.data)
+        reply_text = result.data
         context.chat_data["history"] = result.all_messages()
 
-        return await update.message.reply_markdown_v2(reply_markdown)
+        return await update.message.reply_text(reply_text)
     except Exception as e:
         logging.error(f"Error in image handler: {e}")
-        return await update.message.reply_text("Ein Fehler ist aufgetreten.")
+        return await update.message.reply_markdown("Ein Fehler ist aufgetreten.")
 
 
 async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -97,7 +97,7 @@ async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
         voice_file = await context.bot.get_file(voice.file_id)
         voice_bytes_ogg = await voice_file.download_as_bytearray()
         voice_bytes_wav = convert_ogg_bytes_to_wav_bytes(voice_bytes_ogg)
-        
+
         binary_content = [
             BinaryContent(
                 data=voice_bytes_wav,
@@ -109,7 +109,7 @@ async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         transcript = escape_markdown_v2(result.data)
         await update.message.reply_markdown_v2(f"_{transcript}_")
-        
+
         if "history" not in context.chat_data:
             logging.warning("No history found in chat_data, initializing empty history.")
             context.chat_data["history"] = []
@@ -120,10 +120,10 @@ async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message_history=context.chat_data["history"],
         )
 
-        reply_markdown = escape_markdown_v2(result.data)
+        reply_text = result.data
         context.chat_data["history"] = result.all_messages()
 
-        return await update.message.reply_markdown_v2(reply_markdown)
+        return await update.message.reply_markdown(reply_text)
     except Exception as e:
         logging.error(f"Error in voice handler: {e}")
         return await update.message.reply_text("Ein Fehler ist aufgetreten.")
