@@ -18,7 +18,7 @@ class GeminiSettings(BaseSettings):
         extra="ignore",
     )
 
-    model_name: Literal["gemini-2.0-flash-lite", "gemini-1.5-flash", "gemini-2.5-pro-exp-03-25"]
+    model_name: Literal["gemini-2.0-flash-lite", "gemini-2.0-flash", "gemini-2.5-pro-preview-03-25"]
     api_key: SecretStr
 
     @property
