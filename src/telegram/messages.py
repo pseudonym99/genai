@@ -8,7 +8,11 @@ from src.genai.assistant import assistant_agent
 from src.genai.transcript import transcript_agent
 
 from src.telegram.filters import allowed_user_filter
-from src.telegram.helpers import convert_ogg_bytes_to_wav_bytes, escape_markdown_v2
+from src.telegram.helpers import (
+    convert_ogg_bytes_to_wav_bytes, 
+    escape_markdown_v2, 
+    send_long_message
+)
 
 import logging
 
@@ -29,12 +33,13 @@ async def text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         result = await assistant_agent.run(
             user_prompt=user_prompt,
             message_history=context.chat_data["history"],
+            deps=update
         )
 
         reply_text = result.data
         context.chat_data["history"] = result.all_messages()
 
-        return await update.message.reply_markdown(reply_text)
+        return await send_long_message(update, reply_text)
     except Exception as e:
         logging.error(f"Error in text handler: {e}")
         return await update.message.reply_text("Ein Fehler ist aufgetreten.")
@@ -76,12 +81,13 @@ async def image(update: Update, context: ContextTypes.DEFAULT_TYPE):
         result = await assistant_agent.run(
             user_prompt=user_prompt,
             message_history=context.chat_data["history"],
+            deps=update
         )
 
         reply_text = result.data
         context.chat_data["history"] = result.all_messages()
 
-        return await update.message.reply_text(reply_text)
+        return await send_long_message(update, reply_text)
     except Exception as e:
         logging.error(f"Error in image handler: {e}")
         return await update.message.reply_markdown("Ein Fehler ist aufgetreten.")
@@ -118,12 +124,13 @@ async def voice(update: Update, context: ContextTypes.DEFAULT_TYPE):
         result = await assistant_agent.run(
             user_prompt=transcript,
             message_history=context.chat_data["history"],
+            deps=update
         )
 
         reply_text = result.data
         context.chat_data["history"] = result.all_messages()
 
-        return await update.message.reply_markdown(reply_text)
+        return await send_long_message(update, reply_text)
     except Exception as e:
         logging.error(f"Error in voice handler: {e}")
         return await update.message.reply_text("Ein Fehler ist aufgetreten.")
