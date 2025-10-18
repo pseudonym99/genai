@@ -1,53 +1,68 @@
 from pathlib import Path
 
 import chainlit as cl
+from pydantic_ai import BinaryContent
 
-from src.genai.settings import GEMINI_SETTINGS
-from pydantic_ai import Agent, BinaryContent
-from pydantic_ai.models.gemini import GeminiModel
+from src.agent import AGENT
 
-model = GeminiModel(GEMINI_SETTINGS.model_name, provider=GEMINI_SETTINGS.provider)
-agent = Agent(
-    model,
-    system_prompt=(
-        "Du bist ein hilfreicher Assistent, der auf Deutsch antwortet. "
-    ),
-    result_type=str,
-    retries=2
-)
 
 @cl.on_chat_start
 async def on_chat_start():
+    """
+    Initialisiert eine neue Chat-Session. Erstellt eine leere Nachrichtenhistorie für den Benutzer.
+    """
     cl.user_session.set("message_history", [])
 
 
 @cl.on_message
 async def call_agent(message: cl.Message):
-    message_history = cl.user_session.get("message_history")
-    msg = cl.Message(content="", author="Agent")
-    
-    content = [message.content]
-    elements = message.elements
-    
-    for element in elements:
-        content.append(
-            BinaryContent(
-                data=Path(element.path).read_bytes(),
-                media_type=element.mime
-            )
-        )
-        
-    try:
-        async with agent.run_stream(
-            content,
-            message_history=message_history
-        ) as response:
-            async for chunk in response.stream_text(delta=True):
-                await msg.stream_token(chunk)
-        
-        message_history += response.all_messages()
-        cl.user_session.set("message_history", message_history)
-    except Exception as e:
-        msg.content = f"Fehler: {e}"
+    """
+    Verarbeitet eingehende Benutzernachrichten und generiert Antworten.
 
-    await msg.send()
+    Args:
+        message: Die Nachricht des Benutzers (kann Text und Anhänge enthalten)
+    """
+    # Nachrichtenhistorie aus der Session abrufen
+    message_history = cl.user_session.get("message_history")
+
+    # Antwort-Nachricht vorbereiten
+    response_message = cl.Message(content="", author="Agent")
+
+    # Nachrichteninhalt zusammenstellen (Text + optionale Anhänge)
+    message_content = _build_message_content(message=message)
+
+    # Agent aufrufen und Antwort streamen
+    try:
+        async with AGENT.run_stream(message_content, message_history=message_history) as agent_response:
+            # Antwort Token für Token streamen
+            async for text_chunk in agent_response.stream_text(delta=True):
+                await response_message.stream_token(text_chunk)
+
+        # Nachrichtenhistorie mit neuen Nachrichten aktualisieren
+        updated_history = message_history + agent_response.all_messages()
+        cl.user_session.set("message_history", updated_history)
+    except Exception as error:
+        response_message.content = f"Fehler bei der Verarbeitung: {error}"
+
+    # Antwort an den Benutzer senden
+    await response_message.send()
+
+
+def _build_message_content(message: cl.Message) -> list:
+    """
+    Erstellt den vollständigen Nachrichteninhalt inklusive Anhängen.
+
+    Args:
+        message: Die Chainlit-Nachricht mit Text und optionalen Anhängen
+
+    Returns:
+        Liste mit Nachrichteninhalt (Text und binäre Inhalte)
+    """
+    content = [message.content]
+
+    # Anhänge (z.B. Bilder) als BinaryContent hinzufügen
+    for attachment in message.elements:
+        binary_content = BinaryContent(data=Path(attachment.path).read_bytes(), media_type=attachment.mime)
+        content.append(binary_content)
+
+    return content
